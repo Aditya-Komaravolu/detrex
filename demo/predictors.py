@@ -29,7 +29,7 @@ class VisualizationDemo(object):
         min_size_test=800,
         max_size_test=1333,
         img_format="RGB",
-        metadata_dataset="coco_2017_val",
+        metadata_dataset="snaglist_train",
         instance_mode=ColorMode.IMAGE,
         parallel=False,
     ):
@@ -43,6 +43,7 @@ class VisualizationDemo(object):
         self.metadata = MetadataCatalog.get(
             metadata_dataset if metadata_dataset is not None else "__unused"
         )
+        # print("SELF METADATA: " , self.metadata)
         self.cpu_device = torch.device("cpu")
         self.instance_mode = instance_mode
 

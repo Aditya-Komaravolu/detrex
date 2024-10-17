@@ -19,6 +19,12 @@ import time
 import torch
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
+from detectron2.data.datasets import register_coco_instances
+register_coco_instances("snaglist_train", {}, "/home/aditya/snaglist_dataset_mar11/annotations/instances_train2017.json", "/home/aditya/snaglist_dataset_mar11/train2017")
+register_coco_instances("snaglist_val", {}, "/home/aditya/snaglist_dataset_mar11/annotations/instances_val2017.json", "/home/aditya/snaglist_dataset_mar11/val2017")
+
+
+
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import LazyConfig, instantiate
 from detectron2.engine import (

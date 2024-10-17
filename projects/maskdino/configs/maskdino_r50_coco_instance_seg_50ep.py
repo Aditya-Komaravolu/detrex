@@ -19,22 +19,26 @@ lr_multiplier = L(WarmupParamScheduler)(
     warmup_factor=1.0,
 )
 
+
+model.sem_seg_head.num_classes = 2
+
+
 optimizer = get_config("common/optim.py").AdamW
 # lr_multiplier = get_config("common/coco_schedule.py").lr_multiplier_50ep
 
 # initialize checkpoint to be loaded
-train.init_checkpoint = "detectron2://ImageNetPretrained/torchvision/R-50.pkl"
-train.output_dir = "./output/dab_detr_r50_50ep"
+train.init_checkpoint = "/home/aditya/detrex/maskdino_r50_50ep_300q_hid2048_3sd1_instance_maskenhanced_mask46.3ap_box51.7ap.pth"
+train.output_dir = "/home/aditya/maskdino_r50_coco_instance_seg_50ep_training_d4_may9"
 
 
 # run evaluation every 5000 iters
-train.eval_period = 5000
+train.eval_period = 1000
 
 # log training infomation every 20 iters
-train.log_period = 20
+train.log_period = 100
 
 # save checkpoint every 5000 iters
-train.checkpointer.period = 5000
+train.checkpointer.period = 1000
 
 # gradient clipping for training
 train.clip_grad.enabled = True
@@ -46,18 +50,18 @@ train.device = "cuda"
 
 
 # modify optimizer config
-optimizer.lr = 1e-4
+optimizer.lr = 0.5e-5
 optimizer.betas = (0.9, 0.999)
-optimizer.weight_decay = 1e-4
+optimizer.weight_decay = 3.0e-4
 optimizer.params.lr_factor_func = lambda module_name: 0.1 if "backbone" in module_name else 1
 
 # # modify dataloader config
-dataloader.train.num_workers = 16
+dataloader.train.num_workers = 8
 #
 # # please notice that this is total batch size.
 # # surpose you're using 4 gpus for training and the batch size for
 # # each gpu is 16/4 = 4
-dataloader.train.total_batch_size = 16
+dataloader.train.total_batch_size = 8
 
 # dump the testing results into output_dir for visualization
 dataloader.evaluator.output_dir = train.output_dir

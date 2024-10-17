@@ -15,7 +15,7 @@ from detrex.data.dataset_mappers import COCOInstanceNewBaselineDatasetMapper,coc
 dataloader = OmegaConf.create()
 
 dataloader.train = L(build_detection_train_loader)(
-    dataset=L(get_detection_dataset_dicts)(names="coco_2017_train"),
+    dataset=L(get_detection_dataset_dicts)(names="snaglist_train"),
     mapper=L(COCOInstanceNewBaselineDatasetMapper)(
         augmentation=L(coco_instance_transform_gen)(
             image_size=1024,
@@ -31,7 +31,7 @@ dataloader.train = L(build_detection_train_loader)(
 )
 
 dataloader.test = L(build_detection_test_loader)(
-    dataset=L(get_detection_dataset_dicts)(names="coco_2017_val", filter_empty=False),
+    dataset=L(get_detection_dataset_dicts)(names="snaglist_val", filter_empty=False),
     mapper=L(COCOInstanceNewBaselineDatasetMapper)(
         augmentation=[
             L(T.ResizeShortestEdge)(

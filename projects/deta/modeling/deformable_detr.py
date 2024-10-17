@@ -341,9 +341,17 @@ class DeformableDETR(nn.Module):
 
         for i, (scores_per_image, labels_per_image, box_pred_per_image, image_size) in enumerate(
             zip(all_scores, all_labels, boxes, image_sizes)
+            
         ):
 
-            pre_topk = scores_per_image.topk(10000).indices
+            tensor_size = scores_per_image.size(0)
+
+            # Use min to ensure k does not exceed the number of elements in the tensor
+            k = min(10000, tensor_size)
+
+            # print("Image size: ", image_size)
+
+            pre_topk = scores_per_image.topk(k).indices
             box = box_pred_per_image[pre_topk]
             score = scores_per_image[pre_topk]
             label = labels_per_image[pre_topk]

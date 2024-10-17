@@ -7,6 +7,11 @@
 from detrex.config import get_config
 from ..models.focus_detr_swin_base_384 import model
 
+# from detectron2.data.datasets import register_coco_instances
+# register_coco_instances("snaglist_train", {}, "/home/aditya/snaglist_dataset_mar11/annotations/train.json", "/home/aditya/snaglist_dataset_mar11/train")
+# register_coco_instances("snaglist_val", {}, "/home/aditya/snaglist_dataset_mar11/annotations/valid.json", "/home/aditya/snaglist_dataset_mar11/valid")
+
+
 # get default config
 dataloader = get_config("common/data/coco_detr.py").dataloader
 optimizer = get_config("common/optim.py").AdamW
@@ -14,20 +19,21 @@ lr_multiplier = get_config("common/coco_schedule.py").lr_multiplier_36ep
 train = get_config("common/train.py").train
 
 # modify training config
-train.init_checkpoint = "./pre-trained/Swin_torch/swin_base_patch4_window12_384_22k.pth"
-train.output_dir = "./output/focus_detr_swin_base_384_4scale_22k_36ep"
+# train.init_checkpoint = "/home/aditya/detrex/configs/common/focus_detr_swin_base_384_4scale_22k_36ep.pth"
+train.init_checkpoint = "/home/aditya/detrex/focus_detr_swin_base_384_4scale_22k_36ep.pth"
+train.output_dir = "/home/aditya/focus_detr_training/output/"
 
 # max training iterations
 train.max_iter = 270000
 
 # run evaluation every 5000 iters
-train.eval_period = 5000
+train.eval_period = 1000
 
 # log training infomation every 20 iters
-train.log_period = 20
+train.log_period = 100
 
 # save checkpoint every 5000 iters
-train.checkpointer.period = 5000
+train.checkpointer.period = 1000
 
 # gradient clipping for training
 train.clip_grad.enabled = True

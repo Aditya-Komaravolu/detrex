@@ -17,7 +17,7 @@ from detrex.layers.box_ops import box_cxcywh_to_xyxy
 import torch
 from typing import List
 import torch.nn.functional as F
-
+import numpy as np
 from torch import nn, Tensor
 
 def coords_fmap2orig(feature, stride):
@@ -125,6 +125,7 @@ class GenTargets(nn.Module):
         mask_pos = mask_in_gtboxes & mask_in_level  # & mask_center  # [batch_size,h*w,m]
 
         areas[~mask_pos] = 99999999
+        # print("Areas shape:", np.shape(areas))
         areas_min_ind = torch.min(areas, dim=-1)[1]  # [batch_size,h*w]
 
         classes = torch.broadcast_tensors(classes[:, None, :], areas.long())[0]  # [batch_size,h*w,m]

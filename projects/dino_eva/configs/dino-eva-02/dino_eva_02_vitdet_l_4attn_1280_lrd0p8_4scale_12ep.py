@@ -2,14 +2,16 @@ from functools import partial
 from detrex.config import get_config
 from detrex.modeling.backbone.eva import get_vit_lr_decay_rate
 
+
+
 from ..models.dino_eva_02 import model
 from ..common.coco_loader_lsj_1280 import dataloader
+
 
 # get default config
 optimizer = get_config("common/optim.py").AdamW
 lr_multiplier = get_config("common/coco_schedule.py").lr_multiplier_12ep
 train = get_config("common/train.py").train
-
 
 # modify model config
 model.backbone.net.img_size = 1280 
@@ -29,8 +31,8 @@ model.backbone.net.window_block_indexes = (
 )
 
 # modify training config
-train.init_checkpoint = "/path/to/eva02_L_pt_m38m_p14to16.pt"
-train.output_dir = "./output/dino_eva_02_vitdet_l_4attn_1024_lrd0p8_4scale_12ep"
+train.init_checkpoint = "/home/aditya/detrex/dino_eva_02_m38m_pretrain_vitdet_l_4attn_1280_lrd0p8_4scale_12ep.pth"
+train.output_dir = "/home/aditya/dino-eva_training"
 
 # max training iterations
 train.max_iter = 90000
@@ -54,10 +56,10 @@ optimizer.params.overrides = {}
 optimizer.params.weight_decay_norm = None
 
 # modify dataloader config
-dataloader.train.num_workers = 16
+dataloader.train.num_workers = 4
 
 # please notice that this is total batch size.
 # surpose you're using 4 gpus for training and the batch size for
 # each gpu is 16/4 = 4
-dataloader.train.total_batch_size = 16
+dataloader.train.total_batch_size = 4
 
