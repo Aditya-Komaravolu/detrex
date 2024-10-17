@@ -10,9 +10,15 @@ import time
 import warnings
 import cv2
 import tqdm
-
+from detectron2.data import MetadataCatalog
+from pathlib import Path
 sys.path.insert(0, "./")  # noqa
-from demo.predictors import VisualizationDemo
+
+from detectron2.data.datasets import register_coco_instances
+register_coco_instances("snaglist_train", {}, "/home/aditya/snaglist_dataset_mar11/annotations/instances_train2017.json", "/home/aditya/snaglist_dataset_mar11/train2017")
+register_coco_instances("snaglist_val", {}, "/home/aditya/snaglist_dataset_mar11/annotations/instances_val2017.json", "/home/aditya/snaglist_dataset_mar11/val2017")
+
+from predictors import VisualizationDemo
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import LazyConfig, instantiate
 from detectron2.data.detection_utils import read_image
@@ -122,6 +128,12 @@ if __name__ == "__main__":
 
     model.eval()
 
+    if args.metadata_dataset == "snaglist_train":
+        # MetadataCatalog.get("snaglist_train").set(thing_classes=["grp1", "cement_slurry", "chipping", "cracks", "exposed_reinforcement", "general_uneven", "honeycomb", "incomplete_deshuttering", "moisture_seepage", "snag_2" ])
+        # MetadataCatalog.get("snaglist_train").set(thing_classes=["test", "cement_slurry", "chipping", "honeycomb", "incomplete_deshuttering" ])
+        MetadataCatalog.get("snaglist_train").set(thing_classes=["cement_slurry", "honeycomb" ])
+        # MetadataCatalog.get("snaglist_train").set(thing_classes=["snag_2", "cement_slurry", "chipping", "exposed_reinforcement", "general_uneven", "honeycomb", "incomplete_deshuttering", "moisture_seepage", "grp1", "cracks" ])
+
     demo = VisualizationDemo(
         model=model,
         min_size_test=args.min_size_test,
@@ -150,6 +162,7 @@ if __name__ == "__main__":
             )
 
             if args.output:
+                Path(args.output).mkdir(parents=True, exist_ok=True)
                 if os.path.isdir(args.output):
                     assert os.path.isdir(args.output), args.output
                     out_filename = os.path.join(args.output, os.path.basename(path))
@@ -174,44 +187,65 @@ if __name__ == "__main__":
         cam.release()
         cv2.destroyAllWindows()
     elif args.video_input:
-        video = cv2.VideoCapture(args.video_input)
-        width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        frames_per_second = video.get(cv2.CAP_PROP_FPS)
-        num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-        basename = os.path.basename(args.video_input)
-        codec, file_ext = (
-            ("x264", ".mkv") if test_opencv_video_format("x264", ".mkv") else ("mp4v", ".mp4")
-        )
-        if codec == ".mp4v":
-            warnings.warn("x264 codec not available, switching to mp4v")
-        if args.output:
-            if os.path.isdir(args.output):
-                output_fname = os.path.join(args.output, basename)
-                output_fname = os.path.splitext(output_fname)[0] + file_ext
-            else:
-                output_fname = args.output
-            assert not os.path.isfile(output_fname), output_fname
-            output_file = cv2.VideoWriter(
-                filename=output_fname,
-                # some installation of opencv may not support x264 (due to its license),
-                # you can try other format (e.g. MPEG)
-                fourcc=cv2.VideoWriter_fourcc(*codec),
-                fps=float(frames_per_second),
-                frameSize=(width, height),
-                isColor=True,
+        try:
+            # #validate input paths
+            # validate_paths(
+            #     args.video_input,
+            #     config['odometry']['odom_for_blender'],
+            #     config['odometry']['subsampled_odom_for_blender'],
+            # )
+            video = cv2.VideoCapture(args.video_input)
+            width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            frames_per_second = video.get(cv2.CAP_PROP_FPS)
+            num_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+            basename = os.path.basename(args.video_input)
+            codec, file_ext = (
+                ("x264", ".mkv") if test_opencv_video_format("x264", ".mkv") else ("mp4v", ".mp4")
             )
-        assert os.path.isfile(args.video_input)
-        for vis_frame in tqdm.tqdm(demo.run_on_video(video), total=num_frames):
+            if codec == ".mp4v":
+                warnings.warn("x264 codec not available, switching to mp4v")
+
             if args.output:
-                output_file.write(vis_frame)
-            else:
-                cv2.namedWindow(basename, cv2.WINDOW_NORMAL)
-                cv2.imshow(basename, vis_frame)
-                if cv2.waitKey(1) == 27:
-                    break  # esc to quit
-        video.release()
-        if args.output:
-            output_file.release()
-        else:
-            cv2.destroyAllWindows()
+                Path(args.output).mkdir(parents=True, exist_ok=True)
+            for predictions,vis_frame,frame_count in tqdm.tqdm(demo.run_on_video(video = orig_video, frame_indexes= filtered_frame_numbers), total=len(filtered_frame_numbers)):
+                
+                # prediction_list.append(data)
+                # print(prediction)
+                # print(prediction.shape)
+                predictions = predictions["instances"]
+                scores = list(predictions.scores.cpu().numpy().astype(np.float)) if predictions.has("scores") else None
+                classes = list(predictions.pred_classes.cpu().numpy().astype(np.float)) if predictions.has("pred_classes") else None
+                
+                if scores is not None:
+                    print(predictions.pred_boxes.tensor.cpu().numpy().astype(np.float))
+                    bbox = predictions.pred_boxes.tensor.cpu().numpy().astype(np.float).tolist()
+                    # centroid of all the bounding boxes
+                    centroid_list = []
+                    for box in bbox:
+                        centroid_list.append([(box[0]+box[2])/2, (box[1]+box[3])/2])
+                
+                data = { "frame_count" : frame_count , "predictions" : (scores,classes) , "bbox" : bbox, "centroid_list" : centroid_list}
+                
+                print("FRAME COUNT", frame_count)
+                prediction_list.append(data)
+                # frame_count = frame_count + 1
+                # if frame_count > 1000:
+                #     break
+                print(frame_count,scores, classes)
+                
+                if args.output:
+                    cv2.imwrite(f"{args.output}/{frame_count}.jpg",vis_frame) # Get the path from the hydra config
+                    # output_file.write(vis_frame)
+                else:
+                    cv2.namedWindow(basename, cv2.WINDOW_NORMAL)
+                    cv2.imshow(basename, vis_frame)
+                    if cv2.waitKey(1) == 27:
+                        break  # esc to quit
+            with open(config['rgb_defect_pipeline']['file_paths']['detectron_prediction_dump'], "w+") as f:
+                json.dump(list(prediction_list), f)
+            orig_video.release()
+
+        except Exception as e:
+            logger.error(e)
+            raise e

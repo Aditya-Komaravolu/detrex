@@ -8,12 +8,12 @@ train = dict(
     # The total training iterations
     max_iter=90000,
     # options for Automatic Mixed Precision
-    amp=dict(enabled=False),
+    amp=dict(enabled=True),
     # options for DistributedDataParallel
     ddp=dict(
         broadcast_buffers=False,
         find_unused_parameters=False,
-        fp16_compression=False,
+        fp16_compression=True,
     ),
     # options for Gradient Clipping during training
     clip_grad=dict(
@@ -32,9 +32,9 @@ train = dict(
     # and only `checkpointer.max_to_keep` number of checkpoint will be kept.
     checkpointer=dict(period=5000, max_to_keep=100),
     # run evaluation after every `eval_period` number of iterations
-    eval_period=5000,
+    eval_period=1000,
     # output log to console every `log_period` number of iterations.
-    log_period=20,
+    log_period=100,
     # logging training info to Wandb
     # note that you should add wandb writer in `train_net.py``
     wandb=dict(

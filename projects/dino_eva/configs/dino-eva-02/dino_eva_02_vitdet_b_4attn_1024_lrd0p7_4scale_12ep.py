@@ -27,8 +27,8 @@ model.backbone.net.drop_path_rate = 0.1
 model.backbone.net.window_block_indexes = [0, 1, 3, 4, 6, 7, 9, 10]
 
 # modify training config
-train.init_checkpoint = "/path/to/eva02_B_pt_in21k_p14to16.pt"
-train.output_dir = "./output/dino_eva_02_vitdet_b_4attn_1024_lrd0p7_4scale_12ep"
+train.init_checkpoint = "/home/aditya/detrex/dino_eva_02_in21k_pretrain_vitdet_b_4attn_1024_lrd0p7_4scale_12ep.pth"
+train.output_dir = "/home/aditya/dino-eva-training"
 
 # max training iterations
 train.max_iter = 90000

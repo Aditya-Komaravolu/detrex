@@ -13,7 +13,7 @@ from .focus_detr_r50 import model
 
 # modify backbone config
 model.backbone = L(SwinTransformer)(
-    pretrain_img_size=384,
+    pretrain_img_size=1024,
     embed_dim=128,
     depths=(2, 2, 18, 2),
     num_heads=(4, 8, 16, 32),

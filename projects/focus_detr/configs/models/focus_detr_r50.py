@@ -79,7 +79,7 @@ model = L(FOCUS_DETR)(
         
     ),
     embed_dim=256,
-    num_classes=80,
+    num_classes=10,
     num_queries=900,
     aux_loss=True,
     criterion=L(FOCUS_DETRCriterion)(

@@ -15,14 +15,14 @@ train.output_dir = "./output/dino_vitdet_base_12ep"
 # max training iterations
 train.max_iter = 90000
 
-# run evaluation every 5000 iters
-train.eval_period = 5000
+# run evaluation every 1000 iters
+train.eval_period = 2500
 
 # log training infomation every 20 iters
-train.log_period = 20
+train.log_period = 100
 
-# save checkpoint every 5000 iters
-train.checkpointer.period = 5000
+# save checkpoint every 1000 iters
+train.checkpointer.period = 2500
 
 # gradient clipping for training
 train.clip_grad.enabled = True
@@ -40,12 +40,12 @@ optimizer.weight_decay = 1e-4
 optimizer.params.lr_factor_func = lambda module_name: 0.1 if "backbone" in module_name else 1
 
 # modify dataloader config
-dataloader.train.num_workers = 16
+dataloader.train.num_workers = 2
 
 # please notice that this is total batch size.
 # surpose you're using 4 gpus for training and the batch size for
 # each gpu is 16/4 = 4
-dataloader.train.total_batch_size = 16
+dataloader.train.total_batch_size = 2
 
 # dump the testing results into output_dir for visualization
 dataloader.evaluator.output_dir = train.output_dir

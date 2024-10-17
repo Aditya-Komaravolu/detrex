@@ -1,6 +1,8 @@
+
 import detectron2.data.transforms as T
 from detectron2 import model_zoo
 from detectron2.config import LazyCall as L
+
 
 # Data using LSJ
 image_size = 1280

@@ -9,11 +9,13 @@ from detectron2.data import (
     get_detection_dataset_dicts,
 )
 from detectron2.evaluation import COCOEvaluator
-
+from detectron2.data.datasets import register_coco_instances
+register_coco_instances("snaglist_train", {}, "/home/aditya/snaglist_dataset_mar11/annotations/train.json", "/home/aditya/snaglist_dataset_mar11/train")
+register_coco_instances("snaglist_val", {}, "/home/aditya/snaglist_dataset_mar11/annotations/valid.json", "/home/aditya/snaglist_dataset_mar11/valid")
 dataloader = OmegaConf.create()
 
 dataloader.train = L(build_detection_train_loader)(
-    dataset=L(get_detection_dataset_dicts)(names="coco_2017_train"),
+    dataset=L(get_detection_dataset_dicts)(names="snaglist_train"),
     mapper=L(DatasetMapper)(
         is_train=True,
         augmentations=[
@@ -32,7 +34,7 @@ dataloader.train = L(build_detection_train_loader)(
 )
 
 dataloader.test = L(build_detection_test_loader)(
-    dataset=L(get_detection_dataset_dicts)(names="coco_2017_val", filter_empty=False),
+    dataset=L(get_detection_dataset_dicts)(names="snaglist_val)", filter_empty=False),
     mapper=L(DatasetMapper)(
         is_train=False,
         augmentations=[

@@ -10,8 +10,8 @@ from detectron2.layers import ShapeSpec
 
 
 # modify training config
-train.init_checkpoint = "/path/to/focalnet_large_lrf_384_fl4.pth"
-train.output_dir = "./output/dino_focalnet_large_fl4_5scale_12ep"
+train.init_checkpoint = "/home/aditya/detrex/dino_focalnet_large_lrf_384_fl4_5scale_12ep.pth"
+train.output_dir = "/home/aditya/dino_focalnet_training_apr1_d2"
 
 # convert to 4 focal-level
 model.backbone.focal_levels = (4, 4, 4, 4)

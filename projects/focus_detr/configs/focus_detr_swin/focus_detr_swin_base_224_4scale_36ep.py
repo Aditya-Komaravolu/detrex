@@ -10,13 +10,13 @@ from ..models.focus_detr_swin_base_384 import model
 # get default config
 dataloader = get_config("common/data/coco_detr.py").dataloader
 optimizer = get_config("common/optim.py").AdamW
-lr_multiplier = get_config("common/coco_schedule.py").lr_multiplier_12ep
+lr_multiplier = get_config("common/coco_schedule.py").lr_multiplier_36ep
 train = get_config("common/train.py").train
 
 # modify training config
-train.init_checkpoint = "/cache/detrex/pre_train/swin_base_patch4_window12_384_22k.pth"
-train.output_dir = "./output/focus_detr_swin_base_384_4scale_22k_12ep"
-
+# train.init_checkpoint = "/home/aditya/detrex/configs/common/focus_detr_swin_base_384_4scale_22k_36ep.pth"
+train.init_checkpoint = "/home/aditya/detrex/focus_detr_swin_base_384_4scale_22k_36ep.pth"
+train.output_dir = "/home/aditya/focus_detr_training/output/"
 # max training iterations
 train.max_iter = 270000
 
